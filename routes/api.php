@@ -6,6 +6,8 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\InvoiceAttachmentController;
+use App\Http\Controllers\Admin\TenantAdminController;
+
 
 // clients
 Route::get   ('/clients',        [ClientController::class, 'index']);
