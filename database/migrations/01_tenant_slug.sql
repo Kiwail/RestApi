@@ -1,8 +1,8 @@
-CREATE DATABASE IF NOT EXISTS tenant_acme
+CREATE DATABASE IF NOT EXISTS tenant_evorm
   DEFAULT CHARACTER SET utf8mb4
   DEFAULT   COLLATE utf8mb4_unicode_ci;
 
-USE tenant_acme;
+USE tenant_evorm;
 
 -- Клиент
 CREATE TABLE client (
