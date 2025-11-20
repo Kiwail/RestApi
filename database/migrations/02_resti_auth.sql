@@ -9,10 +9,13 @@ CREATE TABLE auth_user (
   id             CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   email          VARCHAR(320) NOT NULL UNIQUE,
   username       VARCHAR(64)  NULL UNIQUE,
+  phone          VARCHAR(32)  NULL,
   email_verified BOOLEAN NOT NULL DEFAULT FALSE,
-  status         ENUM('active','blocked') NOT NULL DEFAULT 'active',
-  created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  role          ENUM('admin','user') NOT NULL DEFAULT 'user'
+ status         ENUM('active','invited','blocked') NOT NULL DEFAULT 'active',
+ created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
+
 
 -- Пароль пользователя
 CREATE TABLE auth_password (
@@ -30,7 +33,7 @@ CREATE TABLE auth_password (
 CREATE TABLE auth_user_company (
   user_id     CHAR(36) NOT NULL,
   company_id  CHAR(36) NOT NULL,
-  status      ENUM('active','invited','blocked') NOT NULL DEFAULT 'active',
+  status      ENUM('active','invited','blocked','pending') NOT NULL DEFAULT 'pending',
   created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (user_id, company_id),
   KEY idx_company (company_id),

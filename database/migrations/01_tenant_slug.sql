@@ -1,15 +1,15 @@
-CREATE DATABASE IF NOT EXISTS tenant_evorm
+CREATE DATABASE IF NOT EXISTS tenant_slug
   DEFAULT CHARACTER SET utf8mb4
   DEFAULT   COLLATE utf8mb4_unicode_ci;
 
-USE tenant_evorm;
-
+use tenant_slug;
 -- Клиент
 CREATE TABLE client (
   id            CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   auth_user_id  CHAR(36) NULL,    -- глобальный пользователь из resti_auth.auth_user
   name          VARCHAR(255) NOT NULL,
   email         VARCHAR(320) NULL,
+  phone          VARCHAR(32)  NULL,
   created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   KEY idx_auth_user (auth_user_id)
 ) ENGINE=InnoDB;

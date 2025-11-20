@@ -13,6 +13,19 @@ CREATE TABLE company (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
+CREATE TABLE company_join_request (
+  id           CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  company_id   CHAR(36) NOT NULL,        -- resti_core.company.id
+  auth_user_id CHAR(36) NOT NULL,        -- resti_auth.auth_user.id (логическая ссылка)
+  status       ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+  message      VARCHAR(500) NULL,        -- опциональный комментарий от пользователя
+  created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  processed_at TIMESTAMP NULL,
+  processed_by CHAR(36) NULL,            -- кто одобрил/отклонил (auth_user.id, логически)
+  KEY idx_company_status (company_id, status),
+  KEY idx_user (auth_user_id)
+) ENGINE=InnoDB;
+
 -- Реестр tenant-баз
 CREATE TABLE tenant_registry (
   id         CHAR(36) PRIMARY KEY DEFAULT (UUID()),
@@ -37,3 +50,8 @@ CREATE TABLE api_key (
   CONSTRAINT fk_apikey_company FOREIGN KEY (company_id)
     REFERENCES company(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
+ALTER TABLE company_join_request
+  ADD CONSTRAINT fk_cjr_company
+    FOREIGN KEY (company_id) REFERENCES company(id)
+    ON DELETE CASCADE;
