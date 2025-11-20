@@ -97,6 +97,23 @@ return [
             'collation' => 'utf8mb4_unicode_ci',
         ],
 
+    // уже есть mysql / master и т.п.
+
+    'auth' => [
+        'driver' => 'mysql',
+        'host' => env('AUTH_DB_HOST', '127.0.0.1'),
+        'port' => env('AUTH_DB_PORT', '3306'),
+        'database' => env('AUTH_DB_DATABASE', 'resti_auth'),
+        'username' => env('AUTH_DB_USERNAME', 'root'),
+        'password' => env('AUTH_DB_PASSWORD', ''),
+        'charset' => 'utf8mb4',
+        'collation' => 'utf8mb4_unicode_ci',
+        'prefix' => '',
+        'prefix_indexes' => true,
+    ],
+
+
+
     ],
 
     /*
