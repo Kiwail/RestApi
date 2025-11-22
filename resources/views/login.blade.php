@@ -101,7 +101,7 @@
         <div class="error">{{ session('error') }}</div>
     @endif
 
-    <form method="POST" action="/login">
+    <form method="POST" action="login">
         @csrf
 
         <div class="input-group">
@@ -116,8 +116,8 @@
 
         <button type="submit" class="submit-btn">Войти</button>
     </form>
-
-    <a href="/" class="back-link">Вернуться назад</a>
+    <a href="{{ route('register') }}" class="back-link">Нету аккаунта? Зарегистрироваться</a>
+    <a href="index" class="back-link">Вернуться назад</a>
 </div>
 
 </body>

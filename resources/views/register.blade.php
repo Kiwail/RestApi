@@ -101,6 +101,8 @@
     </form>
 
     <a href="{{ route('login') }}" class="back-link">Уже есть аккаунт? Войти</a>
+        <a href="index" class="back-link">Вернуться назад</a>
+
 </div>
 
 </body>

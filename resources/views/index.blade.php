@@ -49,12 +49,14 @@
             color: #666;
             font-size: 18px;
         }
+
     </style>
 </head>
 <body>
 
 <div class="header">
-    <a href="/login" class="auth-btn">Авторизация</a>
+    <a href="login" class="auth-btn">Авторизация</a>
+    <a href="register" class="auth-btn">Регистрация</a>
 </div>
 
 <div class="content">

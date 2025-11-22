@@ -90,7 +90,7 @@ return [
             'driver' => 'mysql',
             'host' => env('MASTER_DB_HOST', '127.0.0.1'),
             'port' => env('MASTER_DB_PORT', '3306'),
-            'database' => env('MASTER_DB_DATABASE', 'resti_master'),
+            'database' => env('MASTER_DB_DATABASE', 'resti_core'),
             'username' => env('MASTER_DB_USERNAME', 'root'),
             'password' => env('MASTER_DB_PASSWORD', ''),
             'charset' => 'utf8mb4',

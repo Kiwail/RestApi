@@ -61,33 +61,48 @@ class AuthController extends Controller
             ->with('success', 'Регистрация успешна! Теперь вы можете войти.');
     }
 
-    public function login(Request $request)
-    {
-        $data = $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required',
-        ]);
+public function login(Request $request)
+{
+    $data = $request->validate([
+        'email'    => 'required|email',
+        'password' => 'required',
+    ]);
 
-        $user = DB::connection('auth')
-            ->table('auth_user')
-            ->join('auth_password', 'auth_password.user_id', '=', 'auth_user.id')
-            ->where('email', $data['email'])
-            ->first();
+    // Ищем пользователя в resti_auth
+    $user = DB::connection('auth')
+        ->table('auth_user')
+        ->join('auth_password', 'auth_password.user_id', '=', 'auth_user.id')
+        ->where('email', $data['email'])
+        ->first();
 
-        if (!$user || !Hash::check($data['password'], $user->hash)) {
-            return back()
-                ->with('error', 'Неверный логин или пароль')
-                ->withInput();
-        }
-
-        session([
-            'auth_user' => [
-                'id'    => $user->id,
-                'email' => $user->email,
-                'role'  => $user->role ?? 'user',
-            ],
-        ]);
-
-        return redirect('/admin');
+    if (!$user || !Hash::check($data['password'], $user->hash)) {
+        return back()
+            ->with('error', 'Неверный логин или пароль')
+            ->withInput();
     }
+
+    // Сохраняем данные в сессию
+    session([
+        'auth_user' => [
+            'id'       => $user->id,
+            'email'    => $user->email,
+            'username' => $user->username,
+            'role'     => $user->role ?? 'user',
+        ],
+    ]);
+
+    // 🔥 ПЕРЕНАПРАВЛЕНИЕ ПОСЛЕ УДАЧНОГО ВХОДА
+    return redirect()->route('apply.form');
+}
+
+
+public function logout(Request $request)
+{
+    // полностью удаляем все данные авторизации
+    $request->session()->forget('auth_user');
+    $request->session()->flush();
+
+    return redirect()->route('login')->with('success', 'Вы вышли из аккаунта');
+}
+
 }
