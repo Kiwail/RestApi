@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\TenantAdminController;
 use App\Http\Controllers\AuthController;
     use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,3 +53,7 @@ Route::get('/apply', [ApplicationController::class, 'showForm'])
 
 Route::post('/apply', [ApplicationController::class, 'submit'])
     ->name('apply.submit');
+    
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+

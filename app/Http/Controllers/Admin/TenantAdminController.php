@@ -126,6 +126,7 @@ class TenantAdminController extends Controller
               auth_user_id  CHAR(36) NULL,
               name          VARCHAR(255) NOT NULL,
               email         VARCHAR(320) NULL,
+              phone         VARCHAR(32) NULL,
               created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
               KEY idx_auth_user (auth_user_id)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci

@@ -62,7 +62,7 @@ class ApplicationController extends Controller
                 'company_id'   => $company->id,
                 'auth_user_id' => $authUser['id'],
                 'status'       => 'pending',
-                'message'      => $data['message'],
+'message' => $data['message'] ?? null,
                 'created_at'   => now(),
             ]);
 
