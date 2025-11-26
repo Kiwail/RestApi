@@ -2,13 +2,13 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ClientController;
-use App\Http\Controllers\ContractController;
-use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\InvoiceAttachmentController;
+use App\Http\Controllers\Api\ClientController;
+use App\Http\Controllers\Api\ContractController;
+use App\Http\Controllers\Api\InvoiceController;
+use App\Http\Controllers\Api\InvoiceAttachmentController;
 use App\Http\Controllers\Api\CompanyJoinRequestController;
 
-
+Route::middleware('tenant.auth')->group(function () {
 // clients
 Route::get   ('/clients',        [ClientController::class, 'index']);
 Route::post  ('/clients',        [ClientController::class, 'store']);
@@ -45,7 +45,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-Route::middleware('tenant.auth')->group(function () {
+
     // Список заявок текущей компании
     Route::get('/join-requests', [CompanyJoinRequestController::class, 'index']);
 

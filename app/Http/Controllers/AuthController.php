@@ -92,7 +92,7 @@ public function login(Request $request)
     ]);
 
     // 🔥 ПЕРЕНАПРАВЛЕНИЕ ПОСЛЕ УДАЧНОГО ВХОДА
-    return redirect()->route('apply.form');
+    return redirect()->route('home');
 }
 
 

@@ -54,6 +54,6 @@ Route::get('/apply', [ApplicationController::class, 'showForm'])
 Route::post('/apply', [ApplicationController::class, 'submit'])
     ->name('apply.submit');
     
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 
