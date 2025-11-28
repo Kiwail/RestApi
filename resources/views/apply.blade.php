@@ -1,39 +1,53 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="lv">
 <head>
     <meta charset="UTF-8">
-    <title>Компании — заявки</title>
+    <title>Kompānijas — pieteikumi</title>
 
     <style>
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #f3f6fb;
+            font-family: system-ui, sans-serif;
+            background: linear-gradient(180deg, #ffffff 0%, #e6daff 90%);
             color: #1f2933;
+                display: flex;
+    flex-direction: column;
+    min-height: 100vh;
         }
+html, body {
+    height: 100%;
+}
+.page {
+    flex: 1;
+}
 
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
+        a { text-decoration: none; color: inherit; }
 
-        /* ====== HEADER ====== */
+        /* HEADER */
 
         .header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 14px 40px;
-            background: #ffffff;
+            background: #fff;
             border-bottom: 1px solid #dde2f0;
             position: sticky;
             top: 0;
             z-index: 10;
         }
+            footer {
+        width: 100%;
+        background: #2b2b2b;
+        text-align: center;
+        padding: 18px 0;
+        font-size: 16px;
+        color: #dcdcdc;
+        margin-top: 40px;
+        }
+
 
         .header-left {
             display: flex;
@@ -72,11 +86,6 @@
             font-size: 14px;
         }
 
-        .lang {
-            color: #6b7280;
-            cursor: pointer;
-        }
-
         .user-pill {
             display: flex;
             align-items: center;
@@ -96,7 +105,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ffffff;
+            color: #fff;
             font-size: 11px;
             font-weight: 700;
         }
@@ -105,17 +114,15 @@
             padding: 6px 10px;
             border-radius: 999px;
             border: none;
-            background: #fee2e2;
+            background: #fee;
             color: #b91c1c;
             font-size: 12px;
             cursor: pointer;
         }
 
-        .logout-btn:hover {
-            background: #fecaca;
-        }
+        .logout-btn:hover { background: #fecaca; }
 
-        /* ====== LAYOUT ====== */
+        /* LAYOUT */
 
         .page {
             display: flex;
@@ -123,9 +130,7 @@
             gap: 24px;
         }
 
-        .sidebar {
-            width: 220px;
-        }
+        .sidebar { width: 220px; }
 
         .sidebar-title {
             font-size: 24px;
@@ -139,9 +144,7 @@
             margin: 0;
         }
 
-        .sidebar-item {
-            margin-bottom: 6px;
-        }
+        .sidebar-item { margin-bottom: 6px; }
 
         .sidebar-link {
             display: block;
@@ -158,19 +161,11 @@
             font-weight: 500;
         }
 
-        /* ====== MAIN ====== */
+        .main { flex: 1; }
 
-        .main {
-            flex: 1;
-        }
+        .search-row { margin-bottom: 18px; }
 
-        .search-row {
-            margin-bottom: 18px;
-        }
-
-        .search-input-wrap {
-            position: relative;
-        }
+        .search-input-wrap { position: relative; }
 
         .search-input {
             width: 100%;
@@ -178,7 +173,7 @@
             border-radius: 999px;
             border: 1px solid #d1d5db;
             font-size: 14px;
-            background: #ffffff;
+            background: #fff;
         }
 
         .search-icon {
@@ -190,9 +185,7 @@
             color: #9ca3af;
         }
 
-        .alerts {
-            margin-bottom: 10px;
-        }
+        .alerts { margin-bottom: 10px; }
 
         .alert {
             padding: 8px 10px;
@@ -211,7 +204,7 @@
             color: #065f46;
         }
 
-        /* ====== COMPANY LIST ====== */
+        /* COMPANY LIST */
 
         .company-list {
             display: grid;
@@ -223,7 +216,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: #ffffff;
+            background: #fff;
             border-radius: 18px;
             padding: 10px 16px;
             box-shadow: 0 2px 5px rgba(15, 23, 42, 0.05);
@@ -259,14 +252,7 @@
             text-overflow: ellipsis;
         }
 
-        .company-meta {
-            font-size: 12px;
-            color: #9ca3af;
-        }
-
-        .company-actions form {
-            margin: 0;
-        }
+        .company-meta { font-size: 12px; color: #9ca3af; }
 
         .btn-add {
             padding: 6px 14px;
@@ -279,35 +265,18 @@
             font-weight: 500;
         }
 
-        .btn-add:hover {
-            background: #c7d2fe;
-        }
+        .btn-add:hover { background: #c7d2fe; }
 
         @media (max-width: 960px) {
-            .page {
-                flex-direction: column;
-            }
-            .sidebar {
-                width: 100%;
-            }
-            .company-list {
-                grid-template-columns: 1fr;
-            }
+            .page { flex-direction: column; }
+            .sidebar { width: 100%; }
+            .company-list { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 @php
-    // Формируем отображаемое имя
-    $displayName = $user['first_name'] ?? null;
-    if ($displayName && !empty($user['last_name'] ?? null)) {
-        $displayName .= ' ' . $user['last_name'];
-    } elseif (empty($displayName) && !empty($user['username'] ?? null)) {
-        $displayName = $user['username'];
-    } else {
-        $displayName = $user['email'] ?? 'Пользователь';
-    }
-
+    $displayName = $user['first_name'] ?? $user['username'] ?? $user['email'];
     $initials = mb_strtoupper(mb_substr($displayName, 0, 1));
 @endphp
 
@@ -316,54 +285,48 @@
         <div class="logo">Resti<span style="color:#4f46e5;">API</span></div>
 
         <nav class="nav">
-            <a href="{{ route('home') }}" class="nav-link">Главная</a>
-            <span class="nav-link active">Компании</span>
-            <span class="nav-link">Архив</span>
-            <span class="nav-link">Сообщения</span>
+            <a href="{{ route('home') }}" class="nav-link">Sākums</a>
+            <span class="nav-link active">Kompānijas</span>
+            <span class="nav-link">Arhīvs</span>
+            <span class="nav-link">Ziņas</span>
         </nav>
     </div>
 
     <div class="header-right">
-        <div class="lang">Русский ▾</div>
-
         <div class="user-pill">
             <div class="user-avatar">{{ $initials }}</div>
             <span>{{ $displayName }}</span>
             <form action="{{ route('logout') }}" method="POST" style="margin-left:8px;">
                 @csrf
-                <button type="submit" class="logout-btn">Выйти</button>
+                <button type="submit" class="logout-btn">Iziet</button>
             </form>
         </div>
     </div>
 </header>
 
 <div class="page">
-    <!-- ЛЕВЫЙ САЙДБАР -->
     <aside class="sidebar">
-        <div class="sidebar-title">Компании</div>
+        <div class="sidebar-title">Kompānijas</div>
         <ul class="sidebar-list">
-            <li class="sidebar-item">
-                <span class="sidebar-link active">Все</span>
-            </li>
-            <li class="sidebar-item"><span class="sidebar-link">Операторы мобильной связи</span></li>
-            <li class="sidebar-item"><span class="sidebar-link">Телевидение и интернет</span></li>
-            <li class="sidebar-item"><span class="sidebar-link">Электричество</span></li>
-            <li class="sidebar-item"><span class="sidebar-link">Обслуживание недвижимости</span></li>
-            <li class="sidebar-item"><span class="sidebar-link">Водоснабжение</span></li>
-            <li class="sidebar-item"><span class="sidebar-link">Отопление</span></li>
-            <li class="sidebar-item"><span class="sidebar-link">Газ</span></li>
-            <li class="sidebar-item"><span class="sidebar-link">Охрана</span></li>
-            <li class="sidebar-item"><span class="sidebar-link">Здоровье и фитнес</span></li>
-            <li class="sidebar-item"><span class="sidebar-link">Другое</span></li>
+            <li class="sidebar-item"><span class="sidebar-link active">Visas</span></li>
+            <li class="sidebar-item"><span class="sidebar-link">Mobilo sakaru operatori</span></li>
+            <li class="sidebar-item"><span class="sidebar-link">TV un internets</span></li>
+            <li class="sidebar-item"><span class="sidebar-link">Elektrība</span></li>
+            <li class="sidebar-item"><span class="sidebar-link">Īpašuma apsaimniekošana</span></li>
+            <li class="sidebar-item"><span class="sidebar-link">Ūdensapgāde</span></li>
+            <li class="sidebar-item"><span class="sidebar-link">Apkure</span></li>
+            <li class="sidebar-item"><span class="sidebar-link">Gāze</span></li>
+            <li class="sidebar-item"><span class="sidebar-link">Apsardze</span></li>
+            <li class="sidebar-item"><span class="sidebar-link">Veselība un sports</span></li>
+            <li class="sidebar-item"><span class="sidebar-link">Cits</span></li>
         </ul>
     </aside>
 
-    <!-- ОСНОВНОЙ КОНТЕНТ -->
     <main class="main">
         <div class="search-row">
             <div class="search-input-wrap">
                 <span class="search-icon">🔍</span>
-                <input type="text" class="search-input" placeholder="Найти компанию…">
+                <input type="text" class="search-input" placeholder="Meklēt kompāniju…">
             </div>
         </div>
 
@@ -402,16 +365,19 @@
                         <form method="POST" action="{{ route('apply.submit') }}">
                             @csrf
                             <input type="hidden" name="company_id" value="{{ $company->id }}">
-                            <button type="submit" class="btn-add">Добавить</button>
+                            <button type="submit" class="btn-add">Pievienot</button>
                         </form>
                     </div>
                 </div>
             @empty
-                <p>Активных компаний пока нет.</p>
+                <p>Nav pieejamu kompāniju.</p>
             @endforelse
         </div>
     </main>
 </div>
+<footer>
+    © 2025 RestApi — Visas tiesības aizsargātas
+</footer>
 
 </body>
 </html>

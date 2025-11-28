@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="lv">
 
 <head>
     <meta charset="UTF-8">
-    <title>Главная — Resti</title>
+    <title>Sākums — Resti</title>
 
     <style>
         * {
@@ -13,14 +13,39 @@
         body {
             margin: 0;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #f3f6fb;
+            background: linear-gradient(180deg, #ffffff 0%, #e6daff 90%);
             color: #1f2933;
+            min-height: 100vh;
         }
+
+        html, body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.page {
+    flex: 1;
+}
 
         a {
             text-decoration: none;
             color: inherit;
         }
+        
+                    footer {
+        width: 100%;
+        background: #2b2b2b;
+        text-align: center;
+        padding: 18px 0;
+        font-size: 16px;
+        color: #dcdcdc;
+        margin-top: 40px;
+        }
+
 
         /* ===== HEADER ===== */
         .header {
@@ -197,117 +222,121 @@
 </head>
 
 <body>
-    @php
-        $displayName = $user['username'] ?? $user['email'];
-        $initials = mb_strtoupper(mb_substr($displayName, 0, 1));
-    @endphp
+@php
+    $displayName = $user['username'] ?? $user['email'];
+    $initials = mb_strtoupper(mb_substr($displayName, 0, 1));
+@endphp
 
-    <header class="header">
-        <div class="header-left">
-            <div class="logo">Resti<span style="color:#4f46e5;">API</span></div>
+<header class="header">
+    <div class="header-left">
+        <div class="logo">Resti<span style="color:#4f46e5;">API</span></div>
 
-            <nav class="nav">
-                <span class="nav-link active">Главная</span>
-                <a href="{{ route('apply.form') }}" class="nav-link">Компании</a>
-                <span class="nav-link">Архив</span>
-                <span class="nav-link">Сообщения</span>
-            </nav>
+        <nav class="nav">
+            <span class="nav-link active">Sākums</span>
+            <a href="{{ route('apply.form') }}" class="nav-link">Kompānijas</a>
+            <span class="nav-link">Arhīvs</span>
+            <span class="nav-link">Ziņas</span>
+        </nav>
+    </div>
+
+    <div class="header-right">
+        <div class="user-pill">
+            <div class="user-avatar">{{ $initials }}</div>
+            <span>{{ $displayName }}</span>
+
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button class="logout-btn">Iziet</button>
+            </form>
+        </div>
+    </div>
+</header>
+
+<div class="page">
+    <div class="row">
+
+        {{-- ===== MANI RĒĶINI ===== --}}
+        <div class="card">
+            <div class="card-title">Mani rēķini</div>
+
+            @if($unpaidInvoices->isEmpty())
+                <div class="card-inner">
+                    <div style="font-size:35px;">🧾</div>
+                    <div class="empty-title">Pagaidām nav rēķinu</div>
+                    <div class="empty-desc">Šeit tiks parādīti tavi neapmaksātie rēķini.</div>
+                </div>
+            @else
+                <div class="card-inner" style="padding-top: 8px; padding-bottom: 8px;">
+                    @foreach($unpaidInvoices as $invoice)
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; padding:8px 0; border-bottom:1px solid #e5e7eb;">
+                            <div style="padding-right:100px;">
+                                <div style="font-weight:600; font-size:14px;">
+                                    {{ $invoice->company_name }}
+                                </div>
+                                <div style="font-size:12px; color:#6b7280; margin-top:2px;">
+                                    Rēķins № {{ $invoice->number }}
+                                </div>
+                                <div style="font-size:12px; color:#6b7280; margin-top:2px;">
+                                    Izrakstīts: {{ \Carbon\Carbon::parse($invoice->issued_on)->format('d.m.Y') }}
+                                </div>
+                                <div style="font-size:12px; color:#6b7280; margin-top:2px;">
+                                    Apmaksāt līdz: {{ \Carbon\Carbon::parse($invoice->due_on)->format('d.m.Y') }}
+                                </div>
+                            </div>
+
+                            <div style="text-align:right;">
+                                <div style="font-weight:700;">
+                                    {{ number_format($invoice->amount_cents / 100, 2, ',', ' ') }} {{ $invoice->currency }}
+                                </div>
+                                <div style="font-size:12px; margin-top:4px; color:#b45309;">
+                                    {{ $invoice->status === 'unpaid' ? 'Gaidā maksājumu' : $invoice->status }}
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
         </div>
 
-        <div class="header-right">
-            <div class="user-pill">
-                <div class="user-avatar">{{ $initials }}</div>
-                <span>{{ $displayName }}</span>
+        <!-- ===== MANAS KOMPĀNIJAS ===== -->
+        <div class="card">
+            <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+                <span>Manas kompānijas</span>
 
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button class="logout-btn">Выйти</button>
-                </form>
+                <a href="{{ route('apply.form') }}">
+                    <button class="btn-small">Pievienot</button>
+                </a>
             </div>
-        </div>
-    </header>
 
-    <div class="page">
-        <div class="row">
-            {{-- ===== МОИ СЧЕТА ===== --}}
-            <div class="card">
-                <div class="card-title">Мои счета</div>
-                @if($unpaidInvoices->isEmpty())
+            <div class="card-container">
+
+                @if($activeCompanies->isEmpty())
                     <div class="card-inner">
-                        <div style="font-size:35px;">🧾</div>
-                        <div class="empty-title">Счетов пока нет</div>
-                        <div class="empty-desc">Здесь будут отображаться ваши неоплаченные счета.</div>
+                        <div style="font-size:35px;">⚪➕</div>
+                        <div class="empty-title">Pagaidām nav kompāniju</div>
+                        <div class="empty-desc">Tās parādīsies pēc pievienošanas.</div>
                     </div>
                 @else
-                    <div class="card-inner" style="padding-top: 8px; padding-bottom: 8px;">
-                        @foreach($unpaidInvoices as $invoice)
-                            <div
-                                style="display:flex; justify-content:space-between; align-items:flex-start; padding:8px 0; border-bottom:1px solid #e5e7eb;">
-                                <div>
-                                    <div style="font-weight:600; font-size:14px;">
-                                        {{ $invoice->company_name }}
-                                    </div>
-                                    <div style="font-size:12px; color:#6b7280; margin-top:2px;">
-                                        Счёт № {{ $invoice->number }}
-                                    </div>
-                                    <div style="font-size:12px; color:#6b7280; margin-top:2px;">
-                                        Выставлен: {{ \Illuminate\Support\Carbon::parse($invoice->issued_on)->format('d.m.Y') }}
-                                    </div>
-                                    <div style="font-size:12px; color:#6b7280; margin-top:2px;">
-                                        Оплатить до: {{ \Illuminate\Support\Carbon::parse($invoice->due_on)->format('d.m.Y') }}
-                                    </div>
-                                </div>
-
-                                <div style="text-align:right;">
-                                    <div style="font-weight:700;">
-                                        {{ number_format($invoice->amount_cents / 100, 2, ',', ' ') }} {{ $invoice->currency }}
-                                    </div>
-                                    <div style="font-size:12px; margin-top:4px; color:#b45309;">
-                                        {{ $invoice->status === 'unpaid' ? 'Ожидает оплаты' : $invoice->status }}
-                                    </div>
-                                </div>
+                    @foreach($activeCompanies as $company)
+                        <div class="card-inner company-card">
+                            <div class="company-title">{{ $company->name }}</div>
+                            <div class="company-desc">Tu esi šīs kompānijas klients</div>
+                            <div class="company-actions">
+                                <a href="/company/{{ $company->slug }}" class="btn-view">Atvērt</a>
                             </div>
-                        @endforeach
-                    </div>
-                @endif
-            </div>
-
-
-            <!-- ===== МОИ КОМПАНИИ ===== -->
-            <div class="card">
-                <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
-                    <span>Мои компании</span>
-
-                    <a href="{{ route('apply.form') }}">
-                        <button class="btn-small">Добавить</button>
-                    </a>
-                </div>
-
-                <div class="card-container">
-
-                    @if($activeCompanies->isEmpty())
-                        <div class="card-inner">
-                            <div style="font-size:35px;">⚪➕</div>
-                            <div class="empty-title">Компаний пока нет</div>
-                            <div class="empty-desc">Они появятся после добавления.</div>
                         </div>
-                    @else
-                        @foreach($activeCompanies as $company)
-                            <div class="card-inner company-card">
-                                <div class="company-title">{{ $company->name }}</div>
-                                <div class="company-desc">Вы являетесь клиентом этой компании</div>
-                                <div class="company-actions">
-                                    <a href="/company/{{ $company->slug }}" class="btn-view">Перейти</a>
-                                </div>
-                            </div>
-                        @endforeach
-                    @endif
+                    @endforeach
+                @endif
 
-                </div>
             </div>
         </div>
 
     </div>
+
+</div>
+<footer>
+    © 2025 RestApi — Visas tiesības aizsargātas
+</footer>
 
 </body>
 

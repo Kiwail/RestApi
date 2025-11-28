@@ -91,9 +91,16 @@ public function login(Request $request)
         ],
     ]);
 
-    // 🔥 ПЕРЕНАПРАВЛЕНИЕ ПОСЛЕ УДАЧНОГО ВХОДА
+    // 👉 Редирект в зависимости от роли
+    if (($user->role ?? 'user') === 'admin') {
+        // маршрут админки, назови его как хочешь
+        return redirect()->route('admin.index');
+    }
+
+    // обычный пользователь
     return redirect()->route('home');
 }
+
 
 
 public function logout(Request $request)

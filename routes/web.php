@@ -24,9 +24,23 @@ Route::get('index', function () {
     return view('index');
 });
 // admin routes
-Route::get('/admin', [TenantAdminController::class, 'index'])               ->name('admin.index');
-Route::post('/admin/tenants', [TenantAdminController::class, 'store'])      ->name('admin.store');
-Route::get('/admin/tenants/{slug}', [TenantAdminController::class, 'show']) ->name('admin.show');
+// admin routes (полностью защищённая группа)
+Route::middleware(['session.auth', 'session.admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+
+        Route::get('/', [TenantAdminController::class, 'index'])
+            ->name('index');
+
+        Route::post('/tenants', [TenantAdminController::class, 'store'])
+            ->name('store');
+
+        Route::get('/tenants/{slug}', [TenantAdminController::class, 'show'])
+            ->name('show');
+
+    });
+
 
 Route::get('register', function () {
     return view('register');
