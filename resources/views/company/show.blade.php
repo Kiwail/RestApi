@@ -3,12 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Sākums — Resti</title>
+    <title>{{ $company->name }} — Resti</title>
 
     <style>
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
@@ -18,34 +16,23 @@
             min-height: 100vh;
         }
 
-        html, body {
-    height: 100%;
-}
+        html, body { height: 100%; }
 
-body {
-    display: flex;
-    flex-direction: column;
-}
+        body { display: flex; flex-direction: column; }
 
-.page {
-    flex: 1;
-}
+        .page { flex: 1; }
 
-        a {
-            text-decoration: none;
-            color: inherit;
+        a { text-decoration: none; color: inherit; }
+
+        footer {
+            width: 100%;
+            background: #2b2b2b;
+            text-align: center;
+            padding: 18px 0;
+            font-size: 16px;
+            color: #dcdcdc;
+            margin-top: 40px;
         }
-        
-                    footer {
-        width: 100%;
-        background: #2b2b2b;
-        text-align: center;
-        padding: 18px 0;
-        font-size: 16px;
-        color: #dcdcdc;
-        margin-top: 40px;
-        }
-
 
         /* ===== HEADER ===== */
         .header {
@@ -185,38 +172,64 @@ body {
             color: #fff;
         }
 
-        .btn-small:hover {
-            opacity: 0.85;
+        .btn-small:hover { opacity: 0.85; }
+
+        .pill {
+            display:inline-block;
+            padding:4px 10px;
+            border-radius:999px;
+            font-size:12px;
+            font-weight:700;
+            background:#f3f4f6;
+            color:#111827;
         }
 
-        .company-card {
-            padding: 20px;
-            text-align: center;
-            border-radius: 12px;
-            border: 1px solid #ddd;
-            background: #fff;
-            margin-bottom: 15px;
+        .pill-warning { background:#fff7ed; color:#b45309; }
+        .pill-ok { background:#ecfdf5; color:#047857; }
+
+        .list-row {
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            padding:8px 0;
+            border-bottom:1px solid #e5e7eb;
         }
 
-        .company-title {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 8px;
+        .list-row:last-child { border-bottom:none; }
+
+        .muted { font-size:12px; color:#6b7280; margin-top:2px; }
+
+        .company-hero {
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            gap:20px;
+            margin-bottom: 18px;
         }
 
-        .company-desc {
-            font-size: 14px;
-            color: #666;
+        .hero-left h2 {
+            margin:0;
+            font-size:26px;
+            font-weight:800;
         }
 
-        .btn-view {
-            display: inline-block;
-            margin-top: 12px;
-            padding: 8px 16px;
-            background: #4a90e2;
-            color: #fff;
-            border-radius: 8px;
-            text-decoration: none;
+        .hero-left .sub {
+            margin-top:6px;
+            color:#6b7280;
+            font-size:13px;
+        }
+
+        .hero-right {
+            text-align:right;
+            color:#6b7280;
+            font-size:12px;
+        }
+
+        @media (max-width: 980px) {
+            .row { grid-template-columns: 1fr; }
+            .header { padding: 14px 16px; }
+            .page { padding: 20px 16px; }
+            .nav { display:none; }
         }
     </style>
 </head>
@@ -231,12 +244,12 @@ body {
     <div style="display:flex;align-items:center;gap:24px;">
         <a href="{{ route('home') }}" class="logo">Resti<span style="color:#4f46e5;">API</span></a>
         <nav class="nav">
-            <span class="nav-link active">Sākums</span>
+            <a href="{{ route('home') }}" class="nav-link">Sākums</a>
             <a href="{{ route('apply.form') }}" class="nav-link">Kompānijas</a>
             <a href="{{ route('profile.show') }}" class="nav-link">Profils</a>
+            <span class="nav-link active">{{ $company->name }}</span>
         </nav>
     </div>
-
     <div class="header-right">
         <div class="user-pill">
             <div class="user-avatar">{{ $initials }}</div>
@@ -251,43 +264,69 @@ body {
 </header>
 
 <div class="page">
+
+    <div class="company-hero">
+        <div class="hero-left">
+            <h2>{{ $company->name }}</h2>
+
+        </div>
+
+        <div class="hero-right">
+            @if($client)
+                <div><span class="pill pill-ok">Klients aktīvs</span></div>
+                <div style="margin-top:6px;">
+                </div>
+                <div style="margin-top:2px;">
+                    {{ $client->name }} · {{ $client->email }}
+                </div>
+            @else
+                <div><span class="pill pill-warning">Nav klienta profila tenant DB</span></div>
+                <div style="margin-top:6px;">Iespējams, approve laikā client netika izveidots.</div>
+            @endif
+        </div>
+    </div>
+
     <div class="row">
-
-        {{-- ===== MANI RĒĶINI ===== --}}
+        {{-- ===== RĒĶINI ===== --}}
         <div class="card">
-            <div class="card-title">Mani rēķini</div>
+            <div class="card-title">Neapmaksātie rēķini</div>
 
-            @if($unpaidInvoices->isEmpty())
+            @if(!$client)
+                <div class="card-inner">
+                    <div style="font-size:35px;">🧾</div>
+                    <div class="empty-title">Nav pieejams</div>
+                    <div class="empty-desc">Vispirms jāizveido client ieraksts tenant DB.</div>
+                </div>
+            @elseif($unpaidInvoices->isEmpty())
                 <div class="card-inner">
                     <div style="font-size:35px;">🧾</div>
                     <div class="empty-title">Pagaidām nav rēķinu</div>
-                    <div class="empty-desc">Šeit tiks parādīti tavi neapmaksātie rēķini.</div>
+                    <div class="empty-desc">Šeit tiks parādīti tavi neapmaksātie rēķini šajā kompānijā.</div>
                 </div>
             @else
                 <div class="card-inner" style="padding-top: 8px; padding-bottom: 8px;">
                     @foreach($unpaidInvoices as $invoice)
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; padding:8px 0; border-bottom:1px solid #e5e7eb;">
-                            <div style="padding-right:100px;">
+                        <div class="list-row">
+                            <div style="padding-right:90px;">
                                 <div style="font-weight:600; font-size:14px;">
-                                    {{ $invoice->company_name }}
-                                </div>
-                                <div style="font-size:12px; color:#6b7280; margin-top:2px;">
                                     Rēķins № {{ $invoice->number }}
                                 </div>
-                                <div style="font-size:12px; color:#6b7280; margin-top:2px;">
+                                <div class="muted">
                                     Izrakstīts: {{ \Carbon\Carbon::parse($invoice->issued_on)->format('d.m.Y') }}
                                 </div>
-                                <div style="font-size:12px; color:#6b7280; margin-top:2px;">
+                                <div class="muted">
                                     Apmaksāt līdz: {{ \Carbon\Carbon::parse($invoice->due_on)->format('d.m.Y') }}
                                 </div>
                             </div>
 
                             <div style="text-align:right;">
-                                <div style="font-weight:700;">
+                                <div style="font-weight:800;">
                                     {{ number_format($invoice->amount_cents / 100, 2, ',', ' ') }} {{ $invoice->currency }}
                                 </div>
-                                <div style="font-size:12px; margin-top:4px; color:#b45309;">
-                                    {{ $invoice->status === 'unpaid' ? 'Gaidā maksājumu' : $invoice->status }}
+                                <div style="font-size:12px; margin-top:4px;">
+                                    <span class="pill pill-warning">
+                                        {{ $invoice->status === 'unpaid' ? 'Gaidā maksājumu' : $invoice->status }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -296,46 +335,58 @@ body {
             @endif
         </div>
 
-        <!-- ===== MANAS KOMPĀNIJAS ===== -->
+        {{-- ===== LĪGUMI ===== --}}
         <div class="card">
             <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
-                <span>Manas kompānijas</span>
-
-                <a href="{{ route('apply.form') }}">
-                    <button class="btn-small">Pievienot</button>
-                </a>
+                <span>Līgumi</span>
+                <a href="{{ route('apply.form') }}"><button class="btn-small">Pievienot kompāniju</button></a>
             </div>
 
-            <div class="card-container">
+            @if(!$client)
+                <div class="card-inner">
+                    <div style="font-size:35px;">📄</div>
+                    <div class="empty-title">Nav pieejams</div>
+                    <div class="empty-desc">Vispirms jāizveido client ieraksts tenant DB.</div>
+                </div>
+            @elseif($contracts->isEmpty())
+                <div class="card-inner">
+                    <div style="font-size:35px;">📄</div>
+                    <div class="empty-title">Pagaidām nav līgumu</div>
+                    <div class="empty-desc">Šeit tiks parādīti tavi līgumi šajā kompānijā.</div>
+                </div>
+            @else
+                <div class="card-inner" style="padding-top: 8px; padding-bottom: 8px;">
+                    @foreach($contracts as $c)
+                        <div class="list-row">
+                            <div style="padding-right:90px;">
+                                <div style="font-weight:700; font-size:14px;">
+                                    {{ $c->number }}
+                                </div>
+                                <div class="muted">
+                                    Izveidots: {{ \Carbon\Carbon::parse($c->created_at)->format('d.m.Y') }}
+                                </div>
+                                <div class="muted">
+                                    Parakstīts: {{ $c->signed_at ? \Carbon\Carbon::parse($c->signed_at)->format('d.m.Y') : '—' }}
+                                </div>
+                            </div>
 
-                @if($activeCompanies->isEmpty())
-                    <div class="card-inner">
-                        <div style="font-size:35px;">⚪➕</div>
-                        <div class="empty-title">Pagaidām nav kompāniju</div>
-                        <div class="empty-desc">Tās parādīsies pēc pievienošanas.</div>
-                    </div>
-                @else
-                    @foreach($activeCompanies as $company)
-                        <div class="card-inner company-card">
-                            <div class="company-title">{{ $company->name }}</div>
-                            <div class="company-desc">Tu esi šīs kompānijas klients</div>
-                            <div class="company-actions">
-                                <a href="company/{{ $company->slug }}" class="btn-view">Atvērt</a>
+                            <div style="text-align:right;">
+                                <span class="pill">
+                                    {{ $c->status }}
+                                </span>
                             </div>
                         </div>
                     @endforeach
-                @endif
-
-            </div>
+                </div>
+            @endif
         </div>
-
     </div>
 
 </div>
+
 <footer>
     © 2025 RestApi — Visas tiesības aizsargātas
 </footer>
 
 </body>
-
 </html>

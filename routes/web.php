@@ -71,3 +71,18 @@ Route::post('/apply', [ApplicationController::class, 'submit'])
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 
+use App\Http\Controllers\CompanyPageController;
+
+Route::middleware(['session.auth'])
+    ->prefix('company')
+    ->group(function () {
+        Route::get('/{slug}', [CompanyPageController::class, 'show'])
+            ->name('company.show');
+    });
+
+use App\Http\Controllers\ProfileController;
+
+Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+Route::post('/profile', [ProfileController::class, 'updateProfile'])->name('profile.update');
+
+Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');

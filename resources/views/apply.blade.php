@@ -114,9 +114,8 @@ html, body {
             padding: 6px 10px;
             border-radius: 999px;
             border: none;
-            background: #fee;
+            background: #fee2e2;
             color: #b91c1c;
-            font-size: 12px;
             cursor: pointer;
         }
 
@@ -281,24 +280,23 @@ html, body {
 @endphp
 
 <header class="header">
-    <div class="header-left">
-        <div class="logo">Resti<span style="color:#4f46e5;">API</span></div>
-
+    <div style="display:flex;align-items:center;gap:24px;">
+        <a href="{{ route(name: 'home') }}" class="logo">Resti<span style="color:#4f46e5;">API</span></a>
         <nav class="nav">
             <a href="{{ route('home') }}" class="nav-link">Sākums</a>
-            <span class="nav-link active">Kompānijas</span>
-            <span class="nav-link">Arhīvs</span>
-            <span class="nav-link">Ziņas</span>
+            <span href="{{ route('apply.form') }}" class="nav-link active">Kompānijas</span>
+            <a href="{{ route('profile.show') }}" class="nav-link">Profils</a>
         </nav>
     </div>
 
     <div class="header-right">
         <div class="user-pill">
             <div class="user-avatar">{{ $initials }}</div>
-            <span>{{ $displayName }}</span>
-            <form action="{{ route('logout') }}" method="POST" style="margin-left:8px;">
+            <a href="{{ route('profile.show') }}">{{ $displayName }}</a>
+
+            <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="logout-btn">Iziet</button>
+                <button class="logout-btn">Iziet</button>
             </form>
         </div>
     </div>
