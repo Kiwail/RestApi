@@ -46,7 +46,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     // Список заявок текущей компании
 Route::get('/join-requests', [CompanyJoinRequestController::class, 'index']);
 Route::post('/join-requests/{id}/approve', [CompanyJoinRequestController::class, 'approve']);
-    
-    // (опционально) отклонить
-    // Route::post('/join-requests/{id}/reject', [CompanyJoinRequestController::class, 'reject']);
+Route::post('/join-requests/{id}/reject', [CompanyJoinRequestController::class, 'reject']);
+
 });
