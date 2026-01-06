@@ -1,4 +1,3 @@
-````md
 # Resti Multi-Tenant REST API (Laravel)
 
 Tīmekļa balstīta platforma ar multi-tenant arhitektūru: centrālās datubāzes (resti_core, resti_auth) + atsevišķa tenant datubāze katram uzņēmumam (tenant_{slug}).  
