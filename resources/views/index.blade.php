@@ -25,7 +25,6 @@
         .nav-left a {
             text-decoration: none;
             color: #000;
-            font-weight: bold;
             font-size: 24px;
         }
 
@@ -95,13 +94,18 @@
             font-size: 16px;
             color: #dcdcdc;
         }
+            .logo {
+            font-size: 24px;
+            font-weight: 800;
+            gap: 24px;
+        }
     </style>
 </head>
 <body>
 
 <div class="navbar">
     <div class="nav-left">
-        <a href="#">RestApi</a>
+        <a href="{{ route('home') }}" class="logo">Resti<span style="color:#4f46e5;">API</span></a>
     </div>
 
     <div class="nav-right">

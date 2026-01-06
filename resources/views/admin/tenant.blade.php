@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="ru">
+<html lang="lv">
 <head>
   <meta charset="utf-8">
-  <title>Tenant: {{ $company->name }}</title>
+  <title>Nomnieks: {{ $company->name }}</title>
   <style>
     body { font-family: system-ui, sans-serif; max-width: 1100px; margin: 32px auto; }
     h1,h2 { margin: 8px 0; }
@@ -14,35 +14,35 @@
 </head>
 <body>
   <h1>{{ $company->name }} ({{ $company->slug }})</h1>
-  <div class="meta">База: <b>{{ $dbName }}</b> | Статус: <b>{{ $company->status }}</b> | <a href="/admin">&larr; назад</a></div>
+  <div class="meta">Datu bāze: <b>{{ $dbName }}</b> | Statuss: <b>{{ $company->status }}</b> | <a href="/admin">&larr; atpakaļ</a></div>
 
-  <h2>Клиенты (первые 50)</h2>
+  <h2>Klienti (pirmie 50)</h2>
   <table>
-    <thead><tr><th>ID</th><th>Имя</th><th>Email</th><th>Создан</th></tr></thead>
+    <thead><tr><th>ID</th><th>Vārds</th><th>E-pasts</th><th>Izveidots</th></tr></thead>
     <tbody>
       @forelse($clients as $x)
         <tr><td>{{ $x->id }}</td><td>{{ $x->name }}</td><td>{{ $x->email }}</td><td>{{ $x->created_at }}</td></tr>
       @empty
-        <tr><td colspan="4">Нет данных</td></tr>
+        <tr><td colspan="4">Nav datu</td></tr>
       @endforelse
     </tbody>
   </table>
 
-  <h2>Контракты (первые 50)</h2>
+  <h2>Līgumi (pirmie 50)</h2>
   <table>
-    <thead><tr><th>ID</th><th>Клиент</th><th>Номер</th><th>Статус</th><th>Подписан</th><th>Создан</th></tr></thead>
+    <thead><tr><th>ID</th><th>Klients</th><th>Numurs</th><th>Statuss</th><th>Parakstīts</th><th>Izveidots</th></tr></thead>
     <tbody>
       @forelse($contracts as $x)
         <tr><td>{{ $x->id }}</td><td>{{ $x->client_id }}</td><td>{{ $x->number }}</td><td>{{ $x->status }}</td><td>{{ $x->signed_at }}</td><td>{{ $x->created_at }}</td></tr>
       @empty
-        <tr><td colspan="6">Нет данных</td></tr>
+        <tr><td colspan="6">Nav datu</td></tr>
       @endforelse
     </tbody>
   </table>
 
-  <h2>Счета (первые 50)</h2>
+  <h2>Rēķini (pirmie 50)</h2>
   <table>
-    <thead><tr><th>ID</th><th>Клиент</th><th>Контракт</th><th>Номер</th><th>Дата</th><th>Срок</th><th>Валюта</th><th>Сумма</th><th>Статус</th><th>Создан</th></tr></thead>
+    <thead><tr><th>ID</th><th>Klients</th><th>Līgums</th><th>Numurs</th><th>Datums</th><th>Termiņš</th><th>Valūta</th><th>Summa</th><th>Statuss</th><th>Izveidots</th></tr></thead>
     <tbody>
       @forelse($invoices as $x)
         <tr>
@@ -58,7 +58,7 @@
           <td>{{ $x->created_at }}</td>
         </tr>
       @empty
-        <tr><td colspan="10">Нет данных</td></tr>
+        <tr><td colspan="10">Nav datu</td></tr>
       @endforelse
     </tbody>
   </table>

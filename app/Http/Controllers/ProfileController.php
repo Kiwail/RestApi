@@ -15,14 +15,14 @@ class ProfileController extends Controller
             return redirect()->route('login');
         }
 
-        // свежие данные из resti_auth
+        // jaunākie dati no resti_auth
         $user = DB::connection('auth')
             ->table('auth_user')
             ->where('id', $authUser['id'])
             ->first();
 
         if (!$user) {
-            // если в сессии есть, а в БД нет — принудительно выйти
+            // ja sesijā ir, bet DB nav — piespiedu kārtā izrakstām
             $request->session()->forget('auth_user');
             return redirect()->route('login');
         }
@@ -57,7 +57,7 @@ class ProfileController extends Controller
                 'phone'    => $data['phone'] ?? null,
             ]);
 
-        // обновим сессию (чтобы header сразу показывал новое имя)
+        // atjaunosim sesiju (lai header uzreiz rādītu jauno vārdu)
         $fresh = DB::connection('auth')
             ->table('auth_user')
             ->where('id', $authUser['id'])

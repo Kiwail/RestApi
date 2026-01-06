@@ -12,11 +12,11 @@ class AuthUser extends Authenticatable
     protected $table = 'auth_user';
     protected $primaryKey = 'id';
 
-    // у тебя UUID, а не auto-increment
+    // tev ir UUID, nevis auto-increment
     public $incrementing = false;
     protected $keyType = 'string';
 
-    // если resti_auth — отдельное подключение
+    // ja resti_auth — atsevišķs savienojums
     protected $connection = 'resti_auth';
 
     protected $fillable = [
@@ -28,7 +28,7 @@ class AuthUser extends Authenticatable
     ];
 
     protected $hidden = [
-        // если будешь хранить что-то секретное
+        // ja glabāsi kaut ko slepenu
     ];
 
     public function isAdmin(): bool

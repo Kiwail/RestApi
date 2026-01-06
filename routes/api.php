@@ -43,7 +43,7 @@ Route::delete('/invoices/{invoiceId}/attachments/{attachmentId}',          [Invo
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-    // Список заявок текущей компании
+    // join-request list
 Route::get('/join-requests', [CompanyJoinRequestController::class, 'index']);
 Route::post('/join-requests/{id}/approve', [CompanyJoinRequestController::class, 'approve']);
 Route::post('/join-requests/{id}/reject', [CompanyJoinRequestController::class, 'reject']);

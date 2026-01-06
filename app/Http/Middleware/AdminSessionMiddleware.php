@@ -12,18 +12,18 @@ class AdminSessionMiddleware
     {
         $authUser = session('auth_user');
 
-        // Не залогинен – на логин
+        // Nav pieteicies — pāradresējam uz pieteikšanos
         if (!$authUser) {
             return redirect()
                 ->route('login')
-                ->with('error', 'Сначала войдите в систему.');
+                ->with('error', 'Vispirms piesakieties sistēmā.');
         }
 
-        // Залогинен, но не админ
+        // Pieteicies, bet nav admins
         if (($authUser['role'] ?? 'user') !== 'admin') {
             return redirect()
                 ->route('home')
-                ->with('error', 'У вас нет доступа к админке.');
+                ->with('error', 'Jums nav piekļuves administratora panelim.');
         }
 
         return $next($request);

@@ -11,16 +11,16 @@ use Symfony\Component\HttpFoundation\Response;
 
 class InvoiceAttachmentController extends Controller
 {
-    // список метаданных вложений счета
+    // rēķina pielikumu metadatu saraksts
     public function index($invoiceId)
     {
-        Invoice::findOrFail($invoiceId); // 404 если нет счета
+        Invoice::findOrFail($invoiceId); // 404, ja rēķins neeksistē
 
         return InvoiceAttachment::where('invoice_id', $invoiceId)
             ->get(['id','invoice_id','filename','content_type','created_at']);
     }
 
-    // скачать одно вложение (бинарник)
+    // lejupielādēt vienu pielikumu (binārais saturs)
     public function show($invoiceId, $attachmentId)
     {
         $att = InvoiceAttachment::where('invoice_id', $invoiceId)
@@ -33,14 +33,14 @@ class InvoiceAttachmentController extends Controller
         ]);
     }
 
-    // загрузить новое вложение
+    // augšupielādēt jaunu pielikumu
     public function store(Request $request, $invoiceId)
     {
         $invoice = Invoice::findOrFail($invoiceId);
 
-        // принимаем multipart/form-data c file=...
+        // pieņemam multipart/form-data ar file=...
         $data = $request->validate([
-            'file' => 'required|file|mimes:pdf|max:5120', // 5MB для примера
+            'file' => 'required|file|mimes:pdf|max:5120', // 5MB, kā piemērs
         ]);
 
         $file     = $data['file'];

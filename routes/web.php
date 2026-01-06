@@ -3,28 +3,19 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\TenantAdminController;
 use App\Http\Controllers\AuthController;
-    use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\HomeController;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
 
 Route::get('/', function () {
     return view('index');
 });
+
 Route::get('index', function () {
     return view('index');
 });
-// admin routes
-// admin routes (полностью защищённая группа)
+
+// Administratora maršruti
+// Administratora maršruti (pilnībā aizsargāta grupa)
 Route::middleware(['session.auth', 'session.admin'])
     ->prefix('admin')
     ->name('admin.')
@@ -41,21 +32,20 @@ Route::middleware(['session.auth', 'session.admin'])
 
     });
 
-
 Route::get('register', function () {
     return view('register');
 })->name('register');
 
-// Обработка формы регистрации (POST)
+// Reģistrācijas formas apstrāde (POST)
 Route::post('register', [AuthController::class, 'register'])
     ->name('register.post');
 
-// Форма логина
+// Pieteikšanās forma
 Route::get('login', function () {
     return view('login');
 })->name('login');
 
-// Обработка логина (POST)
+// Pieteikšanās apstrāde (POST)
 Route::post('login', [AuthController::class, 'login'])
     ->name('login.post');
 
@@ -67,9 +57,8 @@ Route::get('/apply', [ApplicationController::class, 'showForm'])
 
 Route::post('/apply', [ApplicationController::class, 'submit'])
     ->name('apply.submit');
-    
-Route::get('/home', [HomeController::class, 'index'])->name('home');
 
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 use App\Http\Controllers\CompanyPageController;
 

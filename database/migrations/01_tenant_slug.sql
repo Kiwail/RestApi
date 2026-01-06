@@ -14,7 +14,7 @@ CREATE TABLE client (
   KEY idx_auth_user (auth_user_id)
 ) ENGINE=InnoDB;
 
--- Контракт
+-- contract
 CREATE TABLE contract (
   id            CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   client_id     CHAR(36) NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE contract (
     REFERENCES client(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- Счёт
+-- invoice
 CREATE TABLE invoice (
   id            CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   client_id     CHAR(36) NOT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE invoice (
     REFERENCES contract(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
--- Вложения (PDF)
+-- invoice_attachment
 CREATE TABLE invoice_attachment (
   id           CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   invoice_id   CHAR(36) NOT NULL,

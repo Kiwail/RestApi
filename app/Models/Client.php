@@ -10,7 +10,7 @@ class Client extends Model
     protected $primaryKey = 'id';
     public $incrementing = false;
     protected $keyType = 'string';
-    public $timestamps = false; // у нас только created_at без updated_at
+    public $timestamps = false; // mums ir tikai created_at bez updated_at
 
     protected $fillable = [
         'id',

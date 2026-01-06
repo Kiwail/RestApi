@@ -11,7 +11,7 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        // 1. Валидация
+        // 1. Validācija
         $data = $request->validate([
             'email'                 => 'required|email',
             'username'              => 'required|string|max:64',
@@ -19,7 +19,7 @@ class AuthController extends Controller
             'password'              => 'required|confirmed|min:6',
         ]);
 
-        // 2. Проверяем, что такой email ещё не занят
+        // 2. Pārbaudām, vai šāds e-pasts vēl nav aizņemts
         $exists = DB::connection('auth')
             ->table('auth_user')
             ->where('email', $data['email'])
@@ -27,14 +27,14 @@ class AuthController extends Controller
 
         if ($exists) {
             return back()
-                ->with('error', 'Пользователь с такой почтой уже существует')
+                ->with('error', 'Lietotājs ar šādu e-pastu jau eksistē')
                 ->withInput();
         }
 
-        // 3. Генерируем UUID в PHP
+        // 3. Ģenerējam UUID PHP pusē
         $userId = (string) Str::uuid();
 
-        // 4. Создаём пользователя в auth_user
+        // 4. Izveidojam lietotāju tabulā auth_user
         DB::connection('auth')->table('auth_user')->insert([
             'id'             => $userId,
             'email'          => $data['email'],
@@ -42,12 +42,12 @@ class AuthController extends Controller
             'phone'          => $data['phone'],
             'status'         => 'active',
             'email_verified' => false,
-            // если добавишь role:
+            // ja pievienosi role:
             // 'role'        => 'user',
             'created_at'     => now(),
         ]);
 
-        // 5. Создаём запись пароля в auth_password
+        // 5. Izveidojam paroles ierakstu tabulā auth_password
         DB::connection('auth')->table('auth_password')->insert([
             'user_id' => $userId,
             'algo'    => 'bcrypt',
@@ -55,61 +55,58 @@ class AuthController extends Controller
             'set_at'  => now(),
         ]);
 
-        // 6. Перенаправляем на логин
+        // 6. Pāradresējam uz pieteikšanos
         return redirect()
             ->route('login')
-            ->with('success', 'Регистрация успешна! Теперь вы можете войти.');
+            ->with('success', 'Reģistrācija veiksmīga! Tagad varat pieteikties.');
     }
 
-public function login(Request $request)
-{
-    $data = $request->validate([
-        'email'    => 'required|email',
-        'password' => 'required',
-    ]);
+    public function login(Request $request)
+    {
+        $data = $request->validate([
+            'email'    => 'required|email',
+            'password' => 'required',
+        ]);
 
-    // Ищем пользователя в resti_auth
-    $user = DB::connection('auth')
-        ->table('auth_user')
-        ->join('auth_password', 'auth_password.user_id', '=', 'auth_user.id')
-        ->where('email', $data['email'])
-        ->first();
+        // Meklējam lietotāju resti_auth
+        $user = DB::connection('auth')
+            ->table('auth_user')
+            ->join('auth_password', 'auth_password.user_id', '=', 'auth_user.id')
+            ->where('email', $data['email'])
+            ->first();
 
-    if (!$user || !Hash::check($data['password'], $user->hash)) {
-        return back()
-            ->with('error', 'Неверный логин или пароль')
-            ->withInput();
+        if (!$user || !Hash::check($data['password'], $user->hash)) {
+            return back()
+                ->with('error', 'Nepareizs lietotājvārds vai parole')
+                ->withInput();
+        }
+
+        // Saglabājam datus sesijā
+        session([
+            'auth_user' => [
+                'id'       => $user->id,
+                'email'    => $user->email,
+                'username' => $user->username,
+                'role'     => $user->role ?? 'user',
+            ],
+        ]);
+
+        // 👉 Pāradrese atkarībā no lomas
+        if (($user->role ?? 'user') === 'admin') {
+            // admina maršruts, nosauc kā vēlies
+            return redirect()->route('admin.index');
+        }
+
+        // parasts lietotājs
+        return redirect()->route('home');
     }
 
-    // Сохраняем данные в сессию
-    session([
-        'auth_user' => [
-            'id'       => $user->id,
-            'email'    => $user->email,
-            'username' => $user->username,
-            'role'     => $user->role ?? 'user',
-        ],
-    ]);
+    public function logout(Request $request)
+    {
+        // pilnībā dzēšam visus autorizācijas datus
+        $request->session()->forget('auth_user');
+        $request->session()->flush();
 
-    // 👉 Редирект в зависимости от роли
-    if (($user->role ?? 'user') === 'admin') {
-        // маршрут админки, назови его как хочешь
-        return redirect()->route('admin.index');
+        return redirect()->route('login')->with('success', 'Jūs izrakstījāties no konta');
     }
-
-    // обычный пользователь
-    return redirect()->route('home');
-}
-
-
-
-public function logout(Request $request)
-{
-    // полностью удаляем все данные авторизации
-    $request->session()->forget('auth_user');
-    $request->session()->flush();
-
-    return redirect()->route('login')->with('success', 'Вы вышли из аккаунта');
-}
-
 }

@@ -19,7 +19,7 @@ class TenantAdminController extends Controller
 {
     public function index()
     {
-        // список компаний из resti_core
+        // uzņēmumu saraksts no resti_core
         $companies = Company::with('tenantRegistry')->orderBy('created_at','desc')->get();
 
         return view('admin.index', compact('companies'));
@@ -27,23 +27,23 @@ class TenantAdminController extends Controller
 
     public function store(Request $request)
     {
-        // валидируем ввод с формы
+        // validējam ievadi no formas
         $data = $request->validate([
             'name'      => 'required|string|max:255',
             'slug'      => 'required|string|max:64|alpha_dash',
-            'db_name'   => 'nullable|string|max:64', // можно не указывать — сгенерим
+            'db_name'   => 'nullable|string|max:64', // nav obligāti norādīt — izģenerēsim
             'key_name'  => 'nullable|string|max:100',
         ]);
 
         $slug   = strtolower($data['slug']);
         $dbName = $data['db_name'] ?: 'tenant_'.$slug;
         $apiName= $data['key_name'] ?: 'primary';
-        $apiPlainSecret = 'sk_'.$slug.'_'.Str::random(20); // покажем один раз
+        $apiPlainSecret = 'sk_'.$slug.'_'.Str::random(20); // parādīsim vienu reizi
         $apiHash = Hash::make($apiPlainSecret);
 
-        // всё в транзакции master-базы
+        // viss master datubāzes transakcijā
         DB::connection('master')->transaction(function () use ($data, $slug, $dbName, $apiName, $apiHash, &$companyId) {
-            // 1) создаём запись company
+            // 1) izveidojam company ierakstu
             $company = Company::create([
                 'id'     => (string) Str::uuid(),
                 'name'   => $data['name'],
@@ -52,7 +52,7 @@ class TenantAdminController extends Controller
             ]);
             $companyId = $company->id;
 
-            // 2) создаём физическую БД арендатора и схему
+            // 2) izveidojam nomnieka fizisko DB un shēmu
             $this->createTenantDatabase($dbName);
             $this->bootstrapTenantSchema($dbName);
 
@@ -68,12 +68,12 @@ class TenantAdminController extends Controller
                 'id'            => (string) Str::uuid(),
                 'company_id'    => $companyId,
                 'name'          => $apiName,
-                'prefix'        => $slug, // просто удобная метка
+                'prefix'        => $slug, // vienkārši ērta atzīme
                 'hashed_secret' => $apiHash,
             ]);
         });
 
-        // Отобразим админке секрет и готовую Basic-строку (один раз!)
+        // Parādīsim administrācijai noslēpumu un gatavu Basic rindu (vienu reizi!)
         $basic = base64_encode($slug.':'.$apiPlainSecret);
 
         return redirect()
@@ -88,7 +88,7 @@ class TenantAdminController extends Controller
 
     public function show(string $slug)
     {
-        // найдём компанию + БД
+        // atradīsim uzņēmumu + DB
         $company = Company::where('slug',$slug)->with('tenantRegistry')->firstOrFail();
         $dbName  = $company->tenantRegistry?->db_name;
 
@@ -96,10 +96,10 @@ class TenantAdminController extends Controller
             abort(500, 'Tenant DB not found in registry');
         }
 
-        // временно переключимся на БД арендатора
+        // uz laiku pārslēgsimies uz nomnieka DB
         $this->switchTenant($dbName);
 
-        // вытащим немного данных (без пагинации, для простоты)
+        // izvilksim nedaudz datus (bez lapošanas, vienkāršības labad)
         $clients   = Client::query()->orderBy('created_at','desc')->limit(50)->get();
         $contracts = Contract::query()->orderBy('created_at','desc')->limit(50)->get();
         $invoices  = Invoice::query()->orderBy('created_at','desc')->limit(50)->get();
@@ -107,17 +107,17 @@ class TenantAdminController extends Controller
         return view('admin.tenant', compact('company','dbName','clients','contracts','invoices'));
     }
 
-    // --- helpers ---
+    // --- palīgmetodes ---
 
     protected function createTenantDatabase(string $dbName): void
     {
-        // нужен привилегий CREATE DATABASE у mysql-пользователя
+        // mysql lietotājam ir vajadzīgas CREATE DATABASE privilēģijas
         DB::statement("CREATE DATABASE IF NOT EXISTS `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
     }
 
     protected function bootstrapTenantSchema(string $dbName): void
     {
-        // подключимся к только что созданной БД и создадим таблицы из твоей схемы
+        // pieslēgsimies tikko izveidotajai DB un izveidosim tabulas no tavas shēmas
         DB::statement("USE `$dbName`");
 
         DB::statement("

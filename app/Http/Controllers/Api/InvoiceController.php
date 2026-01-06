@@ -11,7 +11,7 @@ class InvoiceController extends Controller
 {
     public function index(Request $request)
     {
-        // Мини-фильтры: client_id, status
+        // Mini-filtri: client_id, status
         $q = Invoice::query();
 
         if ($request->has('client_id')) {
@@ -27,7 +27,7 @@ class InvoiceController extends Controller
 
     public function show($id)
     {
-        // подтягиваем attachments (метаданные, без бинарника)
+        // ielādējam attachments (metadati, bez binārā satura)
         return Invoice::with(['attachments:id,invoice_id,filename,content_type,created_at'])
             ->findOrFail($id);
     }

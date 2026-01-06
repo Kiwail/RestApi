@@ -15,7 +15,7 @@ class TenantAuth
 {
     public function handle($request, Closure $next)
     {
-        // 1. достаём Basic Auth
+        // 1. iegūstam Basic Auth
         $authHeader = $request->header('Authorization');
 
         if (!$authHeader || stripos($authHeader, 'Basic ') !== 0) {
@@ -35,22 +35,22 @@ class TenantAuth
             return $this->unauthorized('Invalid Basic credentials data');
         }
 
-        // 2. ищем компанию по slug
+        // 2. atrodam uzņēmumu pēc slug
         $company = Company::where('slug', $slug)->first();
 
         if (!$company) {
             return $this->unauthorized('Unknown company');
         }
 
-        // статус компании
+        // uzņēmuma statuss
         if ($company->status !== 'active') {
             return response()->json([
                 'message' => 'Company suspended',
             ], Response::HTTP_FORBIDDEN);
         }
 
-        // 3. ищем подходящий ключ компании
-        // Вариант А (простой): пробегаем по всем api_key этой компании и сверяем secret
+        // 3. atrodam atbilstošu uzņēmuma atslēgu
+        // Variants A (vienkāršs): iziet cauri visām šī uzņēmuma api_key un salīdzinām secret
         $apiKeys = ApiKey::where('company_id', $company->id)->get();
 
         $matchedKey = null;
@@ -66,7 +66,7 @@ class TenantAuth
             return $this->unauthorized('Invalid API key');
         }
 
-        // 4. получаем из tenant_registry правильную базу
+        // 4. iegūstam pareizo datubāzi no tenant_registry
         $tenantReg = TenantRegistry::where('company_id', $company->id)->first();
 
         if (!$tenantReg) {
@@ -75,26 +75,26 @@ class TenantAuth
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        $dbName = $tenantReg->db_name; // например "tenant_evorm"
+        $dbName = $tenantReg->db_name; // piemēram, "tenant_evorm"
 
-        // 5. переключаем основное подключение mysql на базу арендатора
+        // 5. pārslēdzam galveno mysql savienojumu uz nomnieka datubāzi
         $this->switchTenantDatabase($dbName);
 
-        // 6. положим контекст в запрос (на будущее)
+        // 6. ieliekam kontekstu pieprasījumā (nākotnei)
         $request->attributes->set('company', $company);
         $request->attributes->set('api_key', $matchedKey);
         $request->attributes->set('tenant_db', $dbName);
 
-        // 7. пропускаем дальше — теперь контроллеры работают уже в tenant_* базе
+        // 7. laižam tālāk — tagad kontrolieri strādā jau tenant_* datubāzē
         return $next($request);
     }
 
     protected function switchTenantDatabase(string $dbName): void
     {
-        // Мы меняем runtime-конфиг коннекта "mysql"
+        // Mēs mainām konnekta "mysql" runtime konfigurāciju
         Config::set('database.connections.mysql.database', $dbName);
 
-        // Сбрасываем текущее соединение и открываем новое
+        // Atiestatām pašreizējo savienojumu un atveram jaunu
         DB::purge('mysql');
         DB::reconnect('mysql');
     }

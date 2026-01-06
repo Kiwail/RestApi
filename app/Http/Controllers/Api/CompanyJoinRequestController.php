@@ -11,7 +11,7 @@ class CompanyJoinRequestController extends Controller
 {
     /**
      * GET /api/join-requests
-     * Вернёт список заявок этой компании (обычно pending).
+     * Atgriezīs šī uzņēmuma pieteikumu sarakstu (parasti pending).
      */
     public function index(Request $request)
     {
@@ -20,11 +20,11 @@ class CompanyJoinRequestController extends Controller
             return response()->json(['message' => 'Company not resolved'], 500);
         }
 
-        // заявки этой компании в resti_core
+        // šī uzņēmuma pieteikumi resti_core
         $requests = DB::connection('master')
             ->table('company_join_request')
             ->where('company_id', $company->id)
-            ->whereIn('status', ['pending', 'approved', 'rejected']) // можно оставить только pending
+            ->whereIn('status', ['pending', 'approved', 'rejected']) // var atstāt tikai pending
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -33,10 +33,10 @@ class CompanyJoinRequestController extends Controller
 
     /**
      * POST /api/join-requests/{id}/approve
-     * Одобряет заявку:
-     *  - помечает company_join_request как approved
-     *  - создаёт/обновляет запись в auth_user_company со статусом active
-     *  - создаёт клиента в tenant-базе (client)
+     * Apstiprina pieteikumu:
+     *  - atzīmē company_join_request kā approved
+     *  - izveido/atjauno ierakstu auth_user_company ar statusu active
+     *  - izveido klientu tenant datubāzē (client)
      */
     public function approve(Request $request, string $id)
     {
@@ -45,9 +45,9 @@ class CompanyJoinRequestController extends Controller
             return response()->json(['message' => 'Company not resolved'], 500);
         }
 
-        // можно добавить проверку, что это админ, если у тебя есть роли
+        // var pievienot pārbaudi, ka tas ir admins, ja tev ir lomas
 
-        // находим заявку в master
+        // atrodam pieteikumu master DB
         $join = DB::connection('master')
             ->table('company_join_request')
             ->where('id', $id)
@@ -56,33 +56,33 @@ class CompanyJoinRequestController extends Controller
             ->first();
 
         if (!$join) {
-            return response()->json(['message' => 'Заявка не найдена или уже обработана'], 404);
+            return response()->json(['message' => 'Pieteikums nav atrasts vai jau ir apstrādāts'], 404);
         }
 
-        // забираем данные пользователя из resti_auth
+        // paņemam lietotāja datus no resti_auth
         $authUser = DB::connection('auth')
             ->table('auth_user')
             ->where('id', $join->auth_user_id)
             ->first();
 
         if (!$authUser) {
-            return response()->json(['message' => 'Пользователь заявки не найден'], 404);
+            return response()->json(['message' => 'Pieteikuma lietotājs nav atrasts'], 404);
         }
 
-        // тут у нас три базы: master, auth, tenant(mysql).
-        // Сделаем по шагам, без одной общей транзакции (иначе нужно распределённую).
+        // te mums ir trīs datubāzes: master, auth, tenant(mysql).
+        // Darīsim pa soļiem, bez vienas kopīgas transakcijas (citādi vajag sadalītu transakciju).
 
-        // 1) Обновляем заявку в master
+        // 1) Atjaunojam pieteikumu master DB
         DB::connection('master')
             ->table('company_join_request')
             ->where('id', $join->id)
             ->update([
                 'status'       => 'approved',
                 'processed_at' => now(),
-                'processed_by' => null, // сюда можно позже писать id админа
+                'processed_by' => null, // te vēlāk var rakstīt admina id
             ]);
 
-        // 2) Обновляем/создаём связь user↔company в resti_auth
+        // 2) Atjaunojam/izveidojam user↔company saiti resti_auth
         DB::connection('auth')
             ->table('auth_user_company')
             ->updateOrInsert(
@@ -96,11 +96,11 @@ class CompanyJoinRequestController extends Controller
                 ]
             );
 
-        // 3) Создаём клиента в tenant-базе компании
-        // Предполагается, что TenantAuth уже сделал switchTenant,
-        // и сейчас connection('mysql') указывает на tenant_DB этой компании.
+        // 3) Izveidojam klientu uzņēmuma tenant datubāzē
+        // Pieņemam, ka TenantAuth jau ir veicis switchTenant,
+        // un tagad connection('mysql') norāda uz šī uzņēmuma tenant_DB.
 
-        // проверим, есть ли уже клиент с таким auth_user_id, чтобы не дублировать
+        // pārbaudīsim, vai klients ar tādu auth_user_id jau eksistē, lai nedublētu
         $existingClient = DB::connection('mysql')
             ->table('client')
             ->where('auth_user_id', $join->auth_user_id)
@@ -120,13 +120,13 @@ class CompanyJoinRequestController extends Controller
         }
 
         return response()->json([
-            'message' => 'Заявка одобрена',
+            'message' => 'Pieteikums apstiprināts',
             'request_id' => $join->id,
         ]);
     }
 
     /**
-     * (Опционально) отклонить заявку.
+     * (Pēc izvēles) noraidīt pieteikumu.
      */
     public function reject(Request $request, string $id)
     {
@@ -143,7 +143,7 @@ class CompanyJoinRequestController extends Controller
             ->first();
 
         if (!$join) {
-            return response()->json(['message' => 'Заявка не найдена или уже обработана'], 404);
+            return response()->json(['message' => 'Pieteikums nav atrasts vai jau ir apstrādāts'], 404);
         }
 
         DB::connection('master')
@@ -155,11 +155,11 @@ class CompanyJoinRequestController extends Controller
                 'processed_by' => null,
             ]);
 
-        // auth_user_company трогать не обязательно, можно вообще не создавать запись,
-        // если заявка отклонена
+        // auth_user_company nav obligāti aiztikt — var pat vispār neveidot ierakstu,
+        // ja pieteikums ir noraidīts
 
         return response()->json([
-            'message' => 'Заявка отклонена',
+            'message' => 'Pieteikums noraidīts',
             'request_id' => $join->id,
         ]);
     }

@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="ru">
+<html lang="lv">
 <head>
   <meta charset="utf-8">
-  <title>Админ — Компании</title>
+  <title>Administrēšana — Uzņēmumi</title>
   <style>
     body { font-family: system-ui, sans-serif; max-width: 960px; margin: 32px auto; }
     table { width: 100%; border-collapse: collapse; margin-top: 16px; }
@@ -15,49 +15,49 @@
   </style>
 </head>
 <body>
-  <h1>Компании (resti_core)</h1>
+  <h1>Uzņēmumi</h1>
 
   @if (session('created_info'))
     @php($i = session('created_info'))
     <div class="flash">
-      <div><b>Создано:</b> {{ $i['slug'] }} (БД: {{ $i['db'] }})</div>
-      <div><b>API Secret (сохраните!):</b> <code>{{ $i['secret'] }}</code></div>
+      <div><b>Izveidots:</b> {{ $i['slug'] }} (DB: {{ $i['db'] }})</div>
+      <div><b>API Secret (saglabājiet!):</b> <code>{{ $i['secret'] }}</code></div>
       <div><b>Authorization:</b> <code>Basic {{ $i['basic'] }}</code></div>
     </div>
   @endif
 
-  <h2>Новая компания</h2>
+  <h2>Jauns uzņēmums</h2>
   <form method="POST" action="{{ route('admin.store') }}">
     @csrf
     <div>
-      <label>Название компании</label>
+      <label>Uzņēmuma nosaukums</label>
       <input type="text" name="name" required placeholder="Evorm SIA" value="{{ old('name') }}">
       @error('name') <div style="color:#c00">{{ $message }}</div> @enderror
     </div>
     <div>
-      <label>Slug (латиница, дефис/подчёркивание)</label>
+      <label>Slug (latīņu burti, domuzīme/pasvītrojums)</label>
       <input type="text" name="slug" required placeholder="evorm" value="{{ old('slug') }}">
       @error('slug') <div style="color:#c00">{{ $message }}</div> @enderror
     </div>
     <div>
-      <label>Имя БД (опционально, по умолчанию tenant_{slug})</label>
+      <label>DB nosaukums (pēc izvēles, pēc noklusējuma tenant_{slug})</label>
       <input type="text" name="db_name" placeholder="tenant_evorm" value="{{ old('db_name') }}">
     </div>
     <div>
-      <label>Имя API ключа (опц.)</label>
+      <label>API atslēgas nosaukums (pēc izvēles)</label>
       <input type="text" name="key_name" placeholder="primary" value="{{ old('key_name') }}">
     </div>
-    <button type="submit">Создать</button>
+    <button type="submit">Izveidot</button>
   </form>
 
-  <h2>Компании</h2>
+  <h2>Uzņēmumi</h2>
   <table>
     <thead>
       <tr>
-        <th>Название</th>
+        <th>Nosaukums</th>
         <th>Slug</th>
-        <th>Статус</th>
-        <th>База</th>
+        <th>Statuss</th>
+        <th>Datu bāze</th>
         <th></th>
       </tr>
     </thead>
@@ -68,10 +68,10 @@
         <td>{{ $c->slug }}</td>
         <td>{{ $c->status }}</td>
         <td>{{ $c->tenantRegistry->db_name ?? '—' }}</td>
-        <td><a href="{{ route('admin.show', $c->slug) }}">Открыть</a></td>
+        <td><a href="{{ route('admin.show', $c->slug) }}">Atvērt</a></td>
       </tr>
     @empty
-      <tr><td colspan="5">Пока пусто</td></tr>
+      <tr><td colspan="5">Pagaidām tukšs</td></tr>
     @endforelse
     </tbody>
   </table>

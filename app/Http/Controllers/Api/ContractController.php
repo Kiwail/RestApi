@@ -12,7 +12,7 @@ class ContractController extends Controller
 {
     public function index(Request $request)
     {
-        // ?client_id=... фильтр по клиенту (минимальный фильтр)
+        // ?client_id=... filtrs pēc klienta (minimālais filtrs)
         $query = Contract::query();
 
         if ($request->has('client_id')) {
@@ -39,7 +39,7 @@ class ContractController extends Controller
         $data['id'] = Str::uuid()->toString();
         $data['status'] = $data['status'] ?? 'active';
 
-        // (uniq per client_id, number) база сама проверит, ловим 23000 при нарушении
+        // (unikāls pēc client_id, number) DB pati pārbaudīs, pie pārkāpuma noķeram 23000
         $contract = Contract::create($data);
 
         return response()->json($contract, 201);

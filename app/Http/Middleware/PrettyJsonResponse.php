@@ -12,9 +12,9 @@ class PrettyJsonResponse
         $response = $next($request);
 
         if ($response instanceof JsonResponse) {
-            // Получаем данные
+            // Iegūstam datus
             $data = $response->getData(true);
-            // Пересоздаём JSON с флагом JSON_PRETTY_PRINT
+            // Izveidojam JSON no jauna ar karogu JSON_PRETTY_PRINT
             $response->setData(json_decode(json_encode($data), true));
             $response->setEncodingOptions(JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         }

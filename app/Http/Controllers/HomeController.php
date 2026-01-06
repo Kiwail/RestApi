@@ -11,34 +11,34 @@ class HomeController extends Controller
     {
         $authUser = session('auth_user');
 
-        // Если не авторизован — уводим на логин
+        // Ja nav autorizēts — pāradresējam uz pieteikšanos
         if (!$authUser) {
             return redirect()->route('login');
         }
 
         $userId = $authUser['id'];
 
-        // 1) Компания-пользователь: связи лежат в resti_auth.auth_user_company
+        // 1) Lietotāja uzņēmumi: saites glabājas resti_auth.auth_user_company
         $companyIds = DB::connection('auth')
             ->table('auth_user_company')
             ->where('user_id', $userId)
-            ->where('status', 'active')   // принят компанией
+            ->where('status', 'active')   // apstiprināts uzņēmumā
             ->pluck('company_id');
 
-        // 2) Сами компании в resti_core.company
+        // 2) Paši uzņēmumi atrodas resti_core.company
         $activeCompanies = DB::connection('master')
             ->table('company')
             ->whereIn('id', $companyIds)
             ->get();
 
-        // 3) tenant_registry: какая компания → какая БД
+        // 3) tenant_registry: kurš uzņēmums → kura DB
         $tenantByCompany = DB::connection('master')
             ->table('tenant_registry')
             ->whereIn('company_id', $companyIds)
             ->get()
             ->keyBy('company_id');
 
-        // 4) Собираем все неоплаченные счета по всем tenant_* базам
+        // 4) Savācam visus neapmaksātos rēķinus no visām tenant_* datubāzēm
         $unpaidInvoices = collect();
 
         foreach ($activeCompanies as $company) {
@@ -49,11 +49,11 @@ class HomeController extends Controller
 
             $dbName = $tenant->db_name;
 
-            // Переключаем mysql на нужную tenant-базу
+            // Pārslēdzam mysql uz vajadzīgo tenant datubāzi
             Config::set('database.connections.mysql.database', $dbName);
             DB::purge('mysql');
 
-            // Ищем счета текущего пользователя в этой базе
+            // Meklējam pašreizējā lietotāja rēķinus šajā datubāzē
             $rows = DB::connection('mysql')
                 ->table('invoice')
                 ->join('client', 'client.id', '=', 'invoice.client_id')
@@ -78,7 +78,7 @@ class HomeController extends Controller
             $unpaidInvoices = $unpaidInvoices->merge($rows);
         }
 
-        // Вернём всё в шаблон
+        // Nododam visu uz skatu (template)
         return view('home', [
             'user'            => $authUser,
             'activeCompanies' => $activeCompanies,

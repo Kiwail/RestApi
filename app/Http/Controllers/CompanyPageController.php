@@ -15,7 +15,7 @@ class CompanyPageController extends Controller
             return redirect()->route('login');
         }
 
-        // 1) Находим компанию в master (resti_core)
+        // 1) Atrodam uzņēmumu master DB (resti_core)
         $company = DB::connection('master')
             ->table('company')
             ->where('slug', $slug)
@@ -26,8 +26,8 @@ class CompanyPageController extends Controller
             abort(404, 'Company not found');
         }
 
-        // 2) Проверяем что пользователь реально "active" клиент этой компании
-        // ВАЖНО: auth_user_company лежит в resti_auth, поэтому connection('auth')
+        // 2) Pārbaudām, ka lietotājs tiešām ir šī uzņēmuma "active" klients
+        // SVARĪGI: auth_user_company atrodas resti_auth, tāpēc izmantojam connection('auth')
         $isMember = DB::connection('auth')
             ->table('auth_user_company')
             ->where('user_id', $authUser['id'])
@@ -39,7 +39,7 @@ class CompanyPageController extends Controller
             abort(403, 'You are not an active client of this company');
         }
 
-        // 3) Берём tenant db_name по company_id
+        // 3) Paņemam tenant db_name pēc company_id
         $tenant = DB::connection('master')
             ->table('tenant_registry')
             ->where('company_id', $company->id)
@@ -49,17 +49,18 @@ class CompanyPageController extends Controller
             abort(500, 'Tenant DB not found in registry');
         }
 
-        // 4) Переключаем mysql на tenant базу
+        // 4) Pārslēdzam mysql uz tenant datubāzi
         $this->switchTenant($tenant->db_name);
 
-        // 5) Ищем client в tenant базе по auth_user_id
+        // 5) Meklējam client tenant datubāzē pēc auth_user_id
         $client = DB::connection('mysql')
             ->table('client')
             ->where('auth_user_id', $authUser['id'])
             ->first();
 
         if (!$client) {
-            // пользователь активный, но client запись ещё не создана в tenant (значит approve не сделал client insert)
+            // lietotājs ir aktīvs, bet client ieraksts vēl nav izveidots tenant DB
+            // (tas nozīmē, ka approve vēl nav izpildījis client insert)
             return view('company.show', [
                 'user' => $authUser,
                 'company' => $company,
@@ -70,7 +71,7 @@ class CompanyPageController extends Controller
             ]);
         }
 
-        // 6) Достаём данные компании для этого клиента
+        // 6) Iegūstam uzņēmuma datus šim klientam
         $unpaidInvoices = DB::connection('mysql')
             ->table('invoice')
             ->where('client_id', $client->id)

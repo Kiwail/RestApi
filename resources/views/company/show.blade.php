@@ -339,7 +339,6 @@
         <div class="card">
             <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
                 <span>Līgumi</span>
-                <a href="{{ route('apply.form') }}"><button class="btn-small">Pievienot kompāniju</button></a>
             </div>
 
             @if(!$client)
