@@ -40,40 +40,13 @@ copy .env.example .env
 php artisan key:generate
 ```
 
-3. Pieslēgums DB (`.env`)
-   Iestati vismaz:
-
-* `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`
-
-Projekts izmanto vairākus savienojumus (piemērs):
-
-* `master` -> `resti_core`
-* `auth`   -> `resti_auth`
-* `tenant` -> dinamiski pārslēdzas uz `tenant_{slug}` (middleware `tenant.auth`)
-
-Pārliecinies, ka `config/database.php` ir definēti šie connections un `.env` satur to DB nosaukumus.
-
-4. Izveido datubāzes MySQL pusē:
+2. Izveido datubāzes MySQL pusē:
 
 * `resti_core`
 * `resti_auth`
   Tenant datubāzes (`tenant_abss`, u.c.) parasti tiek izveidotas automātiski admin darbībās (izveidojot uzņēmumu), ja tev ir uzrakstīta tenant inicializācija.
 
-5. Palaid migrācijas (ja tev migrācijas ir sadalītas pa DB):
-
-```bash
-php artisan migrate --database=auth
-php artisan migrate --database=master
-```
-
-Ja tenant migrācijas tiek palaistas automātiski uzņēmuma izveidē, tad atsevišķi nav jāpalaiž.
-Ja tenant migrācijas ir manuāli, tad:
-
-```bash
-php artisan migrate --database=tenant
-```
-
-6. Palaid projektu:
+3. Palaid projektu:
 
 * XAMPP: novieto projektu `C:\xampp\htdocs\RestApi_Laravel`, atver:
 
